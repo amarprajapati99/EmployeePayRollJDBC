@@ -8,9 +8,9 @@ import java.util.List;
 public class EmployeePayrollDBService {
     private PreparedStatement employeePayrollDataStatement;
     private static EmployeePayrollDBService employeePayrollDBService;
-    public EmployeePayrollDBService() {
+    private PreparedStatement updateEmployeeSalary;
 
-    }
+    public EmployeePayrollDBService() {}
 
     public static EmployeePayrollDBService getInstance() {
         if (employeePayrollDBService == null)
@@ -39,7 +39,7 @@ public class EmployeePayrollDBService {
             Connection connection = this.getConnection();
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(sql);
-            while(result.next()) {
+            while (result.next()) {
                 int id = result.getInt("id");
                 String name = result.getString("name");
                 double salary = result.getDouble("salary");
@@ -53,7 +53,7 @@ public class EmployeePayrollDBService {
         return employeePayrollDataList;
     }
 
-         int updateEmployeeData(String name, Double salary) {
+    int updateEmployeeData(String name, Double salary) {
             return this.updateEmployeeDataUsingStatement(name, salary);
     }
 
@@ -62,6 +62,21 @@ public class EmployeePayrollDBService {
         try (Connection connection = this.getConnection()) {
             Statement statement = connection.createStatement();
             return statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+/* @Description- to update the employee data like name and salary .*/
+
+    public int updateEmployeeDataUsingPreparedStatement(String name, Double salary){
+        List<EmployeePayrollData> employeePayrollList = null;
+        if (this.updateEmployeeSalary == null)
+            this.prepareStatementForToUpdateSalary();
+        try {
+            updateEmployeeSalary.setString(2, name);
+            updateEmployeeSalary.setDouble(1, salary);
+            return updateEmployeeSalary.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -97,12 +112,24 @@ public class EmployeePayrollDBService {
         }
         return employeePayrollList;
     }
+    /* Description- To update the employee data  using prepared statement */
 
     private void prepareStatementForEmployeeData() {
         try {
             Connection connection = this.getConnection();
             String sql = "SELECT * FROM employee_payroll1 WHERE name = ?";
             employeePayrollDataStatement = connection.prepareStatement(sql);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+/* Description- To update the salary using prepared statement */
+
+    private void prepareStatementForToUpdateSalary() {
+        try {
+            Connection connection = this.getConnection();
+            String sql = "update employee_payroll set salary = ? where name = ?";
+            updateEmployeeSalary = connection.prepareStatement(sql);
         } catch (SQLException e) {
             e.printStackTrace();
         }
