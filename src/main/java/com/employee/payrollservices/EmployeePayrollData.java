@@ -6,7 +6,7 @@ import java.util.Objects;
 public class EmployeePayrollData {
     public int id;
     public String name;
-    public double salary;
+    public static double salary;
     public LocalDate startDate;
 
     public EmployeePayrollData(Integer id, String name, Double salary) {
